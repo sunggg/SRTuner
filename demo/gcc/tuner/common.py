@@ -1,5 +1,5 @@
 # Define constant
-FLOAT_MAX=1e100
+FLOAT_MAX = float('inf')
 
 class FlagInfo:
     def __init__(self, name, configs):
@@ -25,9 +25,11 @@ class Evaluator:
 
 
 class Tuner:
-    def __init__(self, search_space, evaluator):
+    def __init__(self, search_space, evaluator, name = "Base Tuner"):
         self.search_space = search_space
         self.evaluator = evaluator
+        self.name = name
+        self.visited = set()
     
     def generate_candidates(self, batch_size=1):
         assert 0, "Undefined"
@@ -44,7 +46,7 @@ class Tuner:
         while i<budget:
             candidates = self.generate_candidates(batch_size=batch_size)
             perfs = self.evaluate_candidates(candidates)
-            self.reflect_feedback(perfs)
+            
 
             i += len(candidates)
             for opt_setting, perf in zip(candidates, perfs):
@@ -52,8 +54,8 @@ class Tuner:
                     best_perf = perf
                     best_opt_setting = opt_setting
             
-            if best_perf == FLOAT_MAX:
-                print(f"[{i}] FLOAT MAX")
-            else:
-                print(f"[{i}] {best_perf:.3f}")
+            
+            print(f"[{i}] {perf:.3f}s, {best_perf:.3f}s")
+            
+            self.reflect_feedback(perfs)
         return best_opt_setting, best_perf

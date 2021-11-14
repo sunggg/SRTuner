@@ -3,8 +3,8 @@ import random, time
 
 class RandomTuner(Tuner):
     def __init__(self, search_space, evaluator):
-        super().__init__(search_space, evaluator)
-        self.visited = set()
+        super().__init__(search_space, evaluator, "Random Tuner")
+        
         
     def generate_candidates(self, batch_size=1):
         random.seed(time.time())
@@ -34,7 +34,7 @@ class RandomTuner(Tuner):
 
 class mPBILTuner(Tuner):
     def __init__(self, search_space, evaluator, learning_rate=1):
-        super().__init__(search_space, evaluator)
+        super().__init__(search_space, evaluator, "mPBIL Tuner")
         self.learning_rate = learning_rate
  
 class OpenTuner(Tuner):
