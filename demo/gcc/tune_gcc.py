@@ -1,7 +1,7 @@
 import os, subprocess, re
 
 from tuner import FlagInfo, Evaluator, FLOAT_MAX
-from tuner import RandomTuner
+from tuner import RandomTuner, SRTuner
 
 # Define GCC flags
 class GCCFlagInfo(FlagInfo):
@@ -157,15 +157,15 @@ if __name__ == "__main__":
     
     # Extract GCC search space
     search_space = read_gcc_opts(gcc_optimization_info)
+    tuners = [RandomTuner(search_space, evaluator), SRTuner(search_space, evaluator)]
 
     for benchmark in benchmark_list:
         path = benchmark_home + "/" + benchmark + "/src"
         evaluator = cBenchEvaluator(path, num_repeats=30, search_space=search_space)
-    
-        random_tuner = RandomTuner(search_space, evaluator)
-        
-        best_opt_setting, best_perf = random_tuner.tune(budget)
-        if best_opt_setting is not None:
-            base_perf = evaluator.evaluate({"stdOptLv":3})
-            best_perf = evaluator.evaluate(best_opt_setting)
-            print(f"Tuning reslut: {base_perf:.3f}/{best_perf:.3f} = {base_perf/best_perf:.3f}x")
+
+        for tuner in tuners:
+            best_opt_setting, best_perf = tuner.tune(budget)
+            if best_opt_setting is not None:
+                base_perf = evaluator.evaluate({"stdOptLv":3})
+                best_perf = evaluator.evaluate(best_opt_setting)
+                print(f"Tuning reslut: {base_perf:.3f}/{best_perf:.3f} = {base_perf/best_perf:.3f}x")
