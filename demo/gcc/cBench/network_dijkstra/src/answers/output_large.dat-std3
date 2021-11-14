@@ -1,0 +1,43 @@
+Matrix size: 40
+AdjMatrix size: 6724
+rgnNodesSize: 328
+Shortest path is 11 in cost. Path is:  0 27 20
+Shortest path is 4 in cost. Path is:  1 10 3 21
+Shortest path is 10 in cost. Path is:  2 6 25 15 32 22
+Shortest path is 2 in cost. Path is:  3 23
+Shortest path is 10 in cost. Path is:  4 17 11 24
+Shortest path is 6 in cost. Path is:  5 31 3 38 25
+Shortest path is 6 in cost. Path is:  6 25 34 26
+Shortest path is 9 in cost. Path is:  7 30 10 24 37 27
+Shortest path is 11 in cost. Path is:  8 36 31 28
+Shortest path is 4 in cost. Path is:  9 29
+Shortest path is 7 in cost. Path is:  10 3 21 39 30
+Shortest path is 6 in cost. Path is:  11 14 35 22 31
+Shortest path is 2 in cost. Path is:  12 15 32
+Shortest path is 7 in cost. Path is:  13 15 6 25 33
+Shortest path is 7 in cost. Path is:  14 25 34
+Shortest path is 7 in cost. Path is:  15 6 25 29 14 35
+Shortest path is 6 in cost. Path is:  16 12 36
+Shortest path is 2 in cost. Path is:  17 37
+Shortest path is 10 in cost. Path is:  18 1 10 3 38
+Shortest path is 7 in cost. Path is:  19 31 3 21 39
+Shortest path is 6 in cost. Path is:  20 30 0
+Shortest path is 4 in cost. Path is:  21 36 1
+Shortest path is 6 in cost. Path is:  22 31 3 38 11 2
+Shortest path is 8 in cost. Path is:  23 33 1 10 3
+Shortest path is 4 in cost. Path is:  24 37 4
+Shortest path is 5 in cost. Path is:  25 29 5
+Shortest path is 6 in cost. Path is:  26 27 12 15 6
+Shortest path is 9 in cost. Path is:  27 17 28 7
+Shortest path is 9 in cost. Path is:  28 13 22 8
+Shortest path is 10 in cost. Path is:  29 14 35 10 9
+Shortest path is 1 in cost. Path is:  30 10
+Shortest path is 4 in cost. Path is:  31 3 38 11
+Shortest path is 10 in cost. Path is:  32 36 27 12
+Shortest path is 1 in cost. Path is:  33 13
+Shortest path is 3 in cost. Path is:  34 29 14
+Shortest path is 3 in cost. Path is:  35 13 15
+Shortest path is 7 in cost. Path is:  36 1 11 16
+Shortest path is 2 in cost. Path is:  37 27 17
+Shortest path is 6 in cost. Path is:  38 5 30 18
+Shortest path is 9 in cost. Path is:  39 30 0 19

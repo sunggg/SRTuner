@@ -1,0 +1,4 @@
+Found dataset:  1
+Command line:   -dct int -progressive -opt -outfile output_large_encode.jpeg ../../consumer_jpeg_data/1.ppm > ftmp_out
+Loop wrap:      2114
+
