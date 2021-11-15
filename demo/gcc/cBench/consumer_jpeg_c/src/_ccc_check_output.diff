@@ -1,0 +1,3 @@
+rm -f tmp-ccc-diff
+diff ftmp_out answers/ftmp_out-std${1} &>> tmp-ccc-diff
+diff output_large_encode.jpeg answers/output_large_encode.jpeg-std${1} &>> tmp-ccc-diff
