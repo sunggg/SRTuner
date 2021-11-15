@@ -16,7 +16,7 @@
          |- baseline_tuners.py     # baseline tuning frameworks w/ prior approaches
       |- cBench/                   # representative benchmark applications
       |- gcc_opts.txt              # optimizations and their possible configurations
-      |- tune_gcc.py               # script that tunes GCC optimizations for cBench applications 
+      |- tune_gcc.py               # script that tunes GCC optimizations for cBench
 ```
 
 

@@ -1,2 +1,0 @@
-rm -f tmp-ccc-diff
-diff output_large.dat answers/output_large.dat-std${1} &>> tmp-ccc-diff

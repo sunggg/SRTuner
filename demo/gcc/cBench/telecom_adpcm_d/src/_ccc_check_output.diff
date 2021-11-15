@@ -1,2 +1,0 @@
-rm -f tmp-ccc-diff
-diff output_large.pcm answers/output_large.pcm-std${1} &>> tmp-ccc-diff

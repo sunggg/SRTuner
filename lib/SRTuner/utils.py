@@ -1,6 +1,7 @@
 import numpy as np
 import fast_histogram
-
+from anytree import PostOrderIter
+import gc
 
 # Define constants
 FLOAT_MIN = (-1)*float('inf')
@@ -25,18 +26,34 @@ def convert_encoding_to_dict(search_space, opt_stage_mapping, encoding):
 def convert_dict_to_encoding(self):
     pass
 
-def default_reward_func(perf, best_perf):
+def delete_tree(root):
+    for node in PostOrderIter(root):
+        del node
+    gc.collect()
+
+
+def default_reward_func(perf, history, batch_size):
     # hyperparameters for reward calc
     # [TODO] Design reward policy that has less hyperparams
-    reward_factor = 40
-    window=500
+    C = 40
+    window=700
     max_reward=100
     reward_margin = -0.03
 
+    num_trials = len(history)
     ratio = best_perf/perf
-    reward = 0
-    if ratio > 1+reward_margin:
-        reward = min(reward_factor*(1+ratio), max_reward)
+
+    # [TODO] Simplify.
+    if num_trials > max(batch_size, num_trials-window):
+        reward = 0
+        if ratio > 1+reward_margin:
+            if ratio<1:
+                factor = 10*(ratio-1)+1
+            else:
+                factor = 30*(ratio-1)+1
+
+            factor = max(0, factor)
+            reward = min(C*(1+ratio), max_reward)
     return reward
 
 

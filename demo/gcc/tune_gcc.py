@@ -128,7 +128,7 @@ class cBenchEvaluator(Evaluator):
         if num_repeats == -1:
             num_repeats = self.num_repeats
 
-        perf = self.run(num_repeats)
+        perf = self.run(num_repeats, input_id=2)
         self.clean()
 
         return perf
@@ -150,12 +150,14 @@ if __name__ == "__main__":
     budget = 1000
     # Benchmark info
     benchmark_home = "./cBench"
-    benchmark_list = ["network_dijkstra", "consumer_jpeg_c", "telecom_adpcm_d"]
+    benchmark_list = ["network_dijkstra"]
+    #benchmark_list = ["network_dijkstra", "consumer_jpeg_c", "telecom_adpcm_d"]
     gcc_optimization_info = "gcc_opts.txt"
     ### END
     
     # Extract GCC search space
     search_space = read_gcc_opts(gcc_optimization_info)
+    default_setting = {"stdOptLv":3}
 
     with open("tuning_result.txt", "w") as ofp:
         ofp.write("=== Result ===")
@@ -164,11 +166,15 @@ if __name__ == "__main__":
         path = benchmark_home + "/" + benchmark + "/src"
         evaluator = cBenchEvaluator(path, num_repeats=30, search_space=search_space)
 
-        tuners = [RandomTuner(search_space, evaluator), SRTuner(search_space, evaluator)]
+        tuners = [
+            RandomTuner(search_space, evaluator, default_setting), 
+            SRTuner(search_space, evaluator, default_setting)
+        ]
+        
         for tuner in tuners:
             best_opt_setting, best_perf = tuner.tune(budget)
             if best_opt_setting is not None:
-                base_perf = evaluator.evaluate({"stdOptLv":3})
+                base_perf = tuner.base_perf
                 best_perf = evaluator.evaluate(best_opt_setting)
                 print(f"Tuning {benchmark} w/ {tuner.name}: {base_perf:.3f}/{best_perf:.3f} = {base_perf/best_perf:.3f}x")
                 with open("tuning_result.txt", "a") as ofp:

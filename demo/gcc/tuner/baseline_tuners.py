@@ -2,8 +2,8 @@ from .common import Tuner, FLOAT_MAX
 import random, time
 
 class RandomTuner(Tuner):
-    def __init__(self, search_space, evaluator):
-        super().__init__(search_space, evaluator, "Random Tuner")
+    def __init__(self, search_space, evaluator, default_setting):
+        super().__init__(search_space, evaluator, "Random Tuner", default_setting)
         
         
     def generate_candidates(self, batch_size=1):

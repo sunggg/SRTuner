@@ -1,1 +1,0 @@
-time ./a.out ../../network_dijkstra_data/1.dat > output_large.dat

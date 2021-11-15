@@ -3,12 +3,13 @@ from anytree.dotexport import RenderTreeGraph
 
 from .utils import (
                     FLOAT_MAX, FLOAT_MIN, isfloat, getNormHist,
-                    getKLD, getUCT, post_order_traversal, checksum, convert_encoding_to_dict, shuffle_encoding,
+                    getKLD, getUCT, post_order_traversal, checksum, convert_encoding_to_dict, shuffle_encoding, delete_tree,
                     default_reward_func
                    )
 import random
 import pandas as pd
 import numpy as np
+import gc
 
 # This module is designed to be called by tuning framework
 # Tuning framework will use the following functions. 
@@ -21,7 +22,8 @@ class SRTunerModule():
             search_space,
             evaluator = None,
             reward_func = None,
-            opt_stage_mapping = None
+            opt_stage_mapping = None,
+            default_perf = None,
         ):
         self.search_space = search_space
 
@@ -39,14 +41,23 @@ class SRTunerModule():
         self.num_optimizations = len(self.opt_stage_mapping)
 
         # Create root node for multi-stage structure
-        self.root = Node(self.opt_stage_mapping[0], encoding="", num=0, reward=0, isDone=False, history=[])
-        
-        self.current_candidate_nodes = []
+        if default_perf is None:
+            self.root = Node(self.opt_stage_mapping[0], encoding="", num=0, reward=0, isDone=False, history=[])
+            self.best_perf = FLOAT_MAX
+            self.worst_perf = FLOAT_MIN
+        elif default_perf != FLOAT_MAX:
+            self.root = Node(self.opt_stage_mapping[0], encoding="", num=0, reward=0, isDone=False, history=[default_perf])
+            self.best_perf = min(default_perf, FLOAT_MAX)
+            self.worst_perf = max(default_perf, FLOAT_MIN)
+
         self.visited = set()
-        self.best_perf = FLOAT_MAX
-        self.worst_perf = FLOAT_MIN
         self.trials = []
         self.shuffle_mask = []
+
+        # Maintain state across invocations. 
+        # [TODO] Can we remove this?
+        self.current_candidate_nodes = []
+        self.batch_size = 1
 
 
     # This will give you candidate and leaf node
@@ -103,6 +114,7 @@ class SRTunerModule():
 
     # generate
     def generate_candidates(self, batch_size = 1):
+        self.batch_size = batch_size # [TODO] Can we remove this?
         candidates, self.current_candidate_nodes = [], []
         for _ in range(batch_size):
             leaf_node = self.traverse()
@@ -183,7 +195,11 @@ class SRTunerModule():
                 kl = 0
 
             klData.append([kl, flag])
-        
+
+            del perfs, p, q
+
+        del bins, statTable 
+
         # Order optimization in the order of its impact
         dfKlData = pd.DataFrame(klData, columns=["KL", "optimization"])
         dfKlData.sort_values(by=["KL"], inplace=True, ascending=False)
@@ -192,8 +208,13 @@ class SRTunerModule():
         # Update the impact
         self.opt_stage_mapping = dfKlData["optimization"].values.tolist()
 
-        #update()
+        del klData, dfKlData
+        gc.collect()
+
         root_num = self.root.num
+        delete_tree(self.root)
+
+        
         self.root = Node(self.opt_stage_mapping[0], encoding="", num=0, reward=0, isDone=False, history=[])
         df_trials = pd.DataFrame(self.trials, columns=["encoding", "performance"])
         
@@ -231,6 +252,8 @@ class SRTunerModule():
             self.backpropagate(cur_node, perf)
 
         assert(root_num == self.root.num)
+        del perfs, encodings, df_trials
+        gc.collect()
         
 
     # update 
@@ -243,10 +266,13 @@ class SRTunerModule():
         root = node_list[-1]
 
         for node in node_list:
-            reward = self.reward_func(perf, self.best_perf)
+            reward = self.reward_func(perf, self.root.history, self.batch_size)
             node.num += 1
             node.reward += reward
             node.history.append(perf)
+            node.history.sort(reverse=True)
+        
+
 
 
     def reflect_feedback(self, perfs, remap_freq = 50):

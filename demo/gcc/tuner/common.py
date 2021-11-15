@@ -25,11 +25,16 @@ class Evaluator:
 
 
 class Tuner:
-    def __init__(self, search_space, evaluator, name = "Base Tuner"):
+    def __init__(self, search_space, evaluator, name = "Base Tuner", default_setting = None):
         self.search_space = search_space
         self.evaluator = evaluator
         self.name = name
+        self.default_setting = default_setting
+        self.default_perf = evaluator.evaluate(default_setting)
         self.visited = set()
+
+        print(f"default_perf : {default_perf:.3f}")
+
     
     def generate_candidates(self, batch_size=1):
         assert 0, "Undefined"

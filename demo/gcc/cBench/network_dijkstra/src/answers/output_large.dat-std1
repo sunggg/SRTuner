@@ -1,8 +1,0 @@
-Matrix size: 5
-AdjMatrix size: 144
-rgnNodesSize: 48
-Shortest path is 3 in cost. Path is:  0 2
-Shortest path is 4 in cost. Path is:  1 3
-Shortest path is 1 in cost. Path is:  2 4
-Shortest path is 4 in cost. Path is:  3 0
-Shortest path is 2 in cost. Path is:  4 0 1

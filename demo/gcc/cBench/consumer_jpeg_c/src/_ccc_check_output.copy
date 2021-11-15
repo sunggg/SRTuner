@@ -1,2 +1,0 @@
-cp -f ftmp_out answers/ftmp_out-std${1}
-cp -f output_large_encode.jpeg answers/output_large_encode.jpeg-std${1}

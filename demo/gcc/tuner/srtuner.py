@@ -3,12 +3,12 @@ from .common import Tuner
 
 # SRTuner as a standalone tuner
 class SRTuner(Tuner):
-    def __init__(self, search_space, evaluator):
-        super().__init__(search_space, evaluator, "SRTuner")
+    def __init__(self, search_space, evaluator, default_setting):
+        super().__init__(search_space, evaluator, "SRTuner", default_setting)
 
         # User can customize reward func as Python function and pass to module.
         # In this demo, we use the default reward func. 
-        self.mod = SRTunerModule(search_space)
+        self.mod = SRTunerModule(search_space, default_perf = self.default_perf)
 
     def generate_candidates(self, batch_size=1):
         return self.mod.generate_candidates()
