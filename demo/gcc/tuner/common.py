@@ -33,7 +33,7 @@ class Tuner:
         self.default_perf = evaluator.evaluate(default_setting)
         self.visited = set()
 
-        print(f"default_perf : {default_perf:.3f}")
+        print(f"default_perf : {self.default_perf:.3f}")
 
     
     def generate_candidates(self, batch_size=1):
@@ -51,8 +51,7 @@ class Tuner:
         while i<budget:
             candidates = self.generate_candidates(batch_size=batch_size)
             perfs = self.evaluate_candidates(candidates)
-            
-
+        
             i += len(candidates)
             for opt_setting, perf in zip(candidates, perfs):
                 if perf < best_perf:

@@ -150,7 +150,7 @@ if __name__ == "__main__":
     budget = 1000
     # Benchmark info
     benchmark_home = "./cBench"
-    benchmark_list = ["network_dijkstra"]
+    benchmark_list = ["consumer_jpeg_c"]
     #benchmark_list = ["network_dijkstra", "consumer_jpeg_c", "telecom_adpcm_d"]
     gcc_optimization_info = "gcc_opts.txt"
     ### END
@@ -160,22 +160,22 @@ if __name__ == "__main__":
     default_setting = {"stdOptLv":3}
 
     with open("tuning_result.txt", "w") as ofp:
-        ofp.write("=== Result ===")
+        ofp.write("=== Result ===\n")
 
     for benchmark in benchmark_list:
         path = benchmark_home + "/" + benchmark + "/src"
         evaluator = cBenchEvaluator(path, num_repeats=30, search_space=search_space)
 
         tuners = [
-            RandomTuner(search_space, evaluator, default_setting), 
+            #RandomTuner(search_space, evaluator, default_setting), 
             SRTuner(search_space, evaluator, default_setting)
         ]
         
         for tuner in tuners:
             best_opt_setting, best_perf = tuner.tune(budget)
             if best_opt_setting is not None:
-                base_perf = tuner.base_perf
+                default_perf = tuner.default_perf
                 best_perf = evaluator.evaluate(best_opt_setting)
-                print(f"Tuning {benchmark} w/ {tuner.name}: {base_perf:.3f}/{best_perf:.3f} = {base_perf/best_perf:.3f}x")
+                print(f"Tuning {benchmark} w/ {tuner.name}: {default_perf:.3f}/{best_perf:.3f} = {default_perf/best_perf:.3f}x")
                 with open("tuning_result.txt", "a") as ofp:
-                    ofp.write(f"Tuning {benchmark} w/ {tuner.name}: {base_perf:.3f}/{best_perf:.3f} = {base_perf/best_perf:.3f}x\n")
+                    ofp.write(f"Tuning {benchmark} w/ {tuner.name}: {default_perf:.3f}/{best_perf:.3f} = {default_perf/best_perf:.3f}x\n")

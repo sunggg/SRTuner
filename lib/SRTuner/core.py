@@ -11,6 +11,29 @@ import pandas as pd
 import numpy as np
 import gc
 
+class FlagInfo:
+    def __init__(self, name, configs):
+        self.name = name
+        self.configs = configs
+
+class Evaluator:
+    def __init__(self, path, num_repeats):
+        self.path = path
+        self.num_repeats = num_repeats
+    
+    def build(self):
+        assert 0, "Undefined"
+
+    def run(self):
+        assert 0, "Undefined"
+
+    def evaluate(self):
+        assert 0, "Undefined"
+
+    def clean(self):
+        assert 0, "Undefined"
+
+
 # This module is designed to be called by tuning framework
 # Tuning framework will use the following functions. 
 #    - batch_candidate_generation()
@@ -23,7 +46,7 @@ class SRTunerModule():
             evaluator = None,
             reward_func = None,
             opt_stage_mapping = None,
-            default_perf = None,
+            default_perf = FLOAT_MAX,
         ):
         self.search_space = search_space
 
@@ -39,16 +62,13 @@ class SRTunerModule():
             self.opt_stage_mapping = opt_stage_mapping
 
         self.num_optimizations = len(self.opt_stage_mapping)
+        self.default_perf = default_perf
 
         # Create root node for multi-stage structure
         if default_perf is None:
             self.root = Node(self.opt_stage_mapping[0], encoding="", num=0, reward=0, isDone=False, history=[])
-            self.best_perf = FLOAT_MAX
-            self.worst_perf = FLOAT_MIN
         elif default_perf != FLOAT_MAX:
             self.root = Node(self.opt_stage_mapping[0], encoding="", num=0, reward=0, isDone=False, history=[default_perf])
-            self.best_perf = min(default_perf, FLOAT_MAX)
-            self.worst_perf = max(default_perf, FLOAT_MIN)
 
         self.visited = set()
         self.trials = []
@@ -72,14 +92,16 @@ class SRTunerModule():
                 # Need to explore. Random sampling
                 while True:
                     chosenConfig = random.randint(0,numConfigs-1)
-                    for child in cur_node.children:
-                        if len(child.encoding) == 0:
-                            print(child)
                     if not any([child.encoding[-1] == str(chosenConfig) for child in cur_node.children]):
                         break
 
-                new_encoding = cur_node.encoding + str(chosenConfig)
-                if len(new_encoding) == self.num_optimizations:
+                # Attach new config
+                if len(cur_node.encoding):
+                    new_encoding = cur_node.encoding + "," + str(chosenConfig)
+                else:
+                    new_encoding = str(chosenConfig)
+
+                if cur_node.depth+1 == self.num_optimizations:
                      # leaf node
                     return Node("leaf", parent=cur_node, encoding=new_encoding, num=0, reward=0, isDone=True, history=[])
                 else:
@@ -275,7 +297,7 @@ class SRTunerModule():
 
 
 
-    def reflect_feedback(self, perfs, remap_freq = 50):
+    def reflect_feedback(self, perfs, remap_freq = 100):
         for leaf_node, perf in zip(self.current_candidate_nodes, perfs):
             self.backpropagate(leaf_node, perf)
 

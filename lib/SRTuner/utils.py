@@ -18,7 +18,7 @@ def isfloat(value):
 def convert_encoding_to_dict(search_space, opt_stage_mapping, encoding):
     # opt-stage mapping is the same order w/ encoding
     opt_setting = dict()
-    for opt_name, config in zip(opt_stage_mapping, encoding):
+    for opt_name, config in zip(opt_stage_mapping, encoding.split(',')):
         opt_setting[opt_name] = search_space[opt_name].configs[int(config)]
     return opt_setting
 
@@ -41,7 +41,7 @@ def default_reward_func(perf, history, batch_size):
     reward_margin = -0.03
 
     num_trials = len(history)
-    ratio = best_perf/perf
+    ratio = history[-1]/perf
 
     # [TODO] Simplify.
     if num_trials > max(batch_size, num_trials-window):
@@ -53,7 +53,7 @@ def default_reward_func(perf, history, batch_size):
                 factor = 30*(ratio-1)+1
 
             factor = max(0, factor)
-            reward = min(C*(1+ratio), max_reward)
+            reward = min(C*factor, max_reward)
     return reward
 
 

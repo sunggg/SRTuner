@@ -11,7 +11,7 @@ class SRTuner(Tuner):
         self.mod = SRTunerModule(search_space, default_perf = self.default_perf)
 
     def generate_candidates(self, batch_size=1):
-        return self.mod.generate_candidates()
+        return self.mod.generate_candidates(batch_size)
 
     def evaluate_candidates(self, candidates):
         return [self.evaluator.evaluate(opt_setting, num_repeats=3) for opt_setting in candidates]
