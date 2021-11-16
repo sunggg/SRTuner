@@ -237,10 +237,12 @@ class SRTunerModule():
         root_num = self.root.num
         delete_tree(self.root)
 
-        
-        self.root = Node(self.opt_stage_mapping[0], encoding="", num=0, reward=0, isDone=False, history=[])
+        # Create root node for multi-stage structure
+        if default_perf is None:
+            self.root = Node(self.opt_stage_mapping[0], encoding="", num=0, reward=0, isDone=False, history=[])
+        elif default_perf != FLOAT_MAX:
+            self.root = Node(self.opt_stage_mapping[0], encoding="", num=0, reward=0, isDone=False, history=[default_perf])
         df_trials = pd.DataFrame(self.trials, columns=["encoding", "performance"])
-        
         
         encodings = df_trials["encoding"].values
         perfs = df_trials["performance"].values
@@ -296,8 +298,6 @@ class SRTunerModule():
             node.history.sort(reverse=True)
         
 
-
-
     def reflect_feedback(self, perfs, remap_freq = 100):
         for leaf_node, perf in zip(self.current_candidate_nodes, perfs):
             self.backpropagate(leaf_node, perf)
@@ -306,7 +306,8 @@ class SRTunerModule():
             if perf != FLOAT_MAX:
                 self.worst_perf = max(self.worst_perf, perf)
             self.trials.append([leaf_node.encoding, perf])
-            
+        
+        self.current_candidate_nodes = []
 
         if self.root.num % remap_freq == 0:
             self.remap()
