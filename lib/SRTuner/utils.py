@@ -44,8 +44,8 @@ def default_reward_func(perf, history, batch_size):
     ratio = history[-1]/perf
 
     # [TODO] Simplify.
+    reward = 0
     if num_trials > max(batch_size, num_trials-window):
-        reward = 0
         if ratio > 1+reward_margin:
             if ratio<1:
                 factor = 10*(ratio-1)+1
