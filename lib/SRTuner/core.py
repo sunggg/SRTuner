@@ -70,6 +70,7 @@ class SRTunerModule():
         elif default_perf != FLOAT_MAX:
             self.root = Node(self.opt_stage_mapping[0], encoding="", num=0, reward=0, isDone=False, history=[default_perf])
 
+        self.best_perf, self.worst_perf = FLOAT_MAX, FLOAT_MIN
         self.visited = set()
         self.trials = []
         self.shuffle_mask = []
