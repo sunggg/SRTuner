@@ -73,18 +73,19 @@ def post_order_traversal(node, statTable = None):
         for child in node.children:
             data = post_order_traversal(child, statTable)
             if statTable != None:
-                assert(int(child.encoding[-1]) < len(statTable[node.depth]))
-                statTable[node.depth][int(child.encoding[-1])].extend(data)
+                config = int(get_subencoding(child.encoding, -1))
+                if node.depth >= len(statTable):
+                    print(node)
+                assert config < len(statTable[node.depth])
+                statTable[node.depth][config].extend(data)
             aggr.extend(data)
 
         return aggr
 
 def getNormHist(bins, data):
     count = fast_histogram.histogram1d(data, len(bins), range=(min(bins), max(bins)))
-    #count, _, _ = plt.hist(data, numBins)
     tot = sum(count)
     num = len(data)
-
     assert(num >= tot)
     count = np.append(count, [num-tot])
     return count/num
@@ -136,7 +137,19 @@ def getKLD(p, q):
 
 
 def shuffle_encoding(encoding, shuffle_mask):
+    toks = encoding.split(',')
     new_encoding = ""
     for idx in shuffle_mask:
-        new_encoding += encoding[idx]
+        if len(new_encoding):
+            new_encoding += "," + toks[idx]
+        else:
+            new_encoding += toks[idx]
     return new_encoding
+
+
+def get_subencoding(encoding, l):
+    if l == -1:
+        return encoding.split(',')[-1]
+    else:
+        toks = encoding.split(',')[0:l+1]
+        return ",".join(toks)

@@ -20,7 +20,7 @@ class GCCFlagInfo(FlagInfo):
 def read_gcc_opts(path):
     search_space = dict() # pair: flag, configs
     # special case handling
-    search_space["stdOptLv"] = GCCFlagInfo(name="stdOptLv", configs=[1,2,3], isParametric=True, stdOptLv=-1) 
+    search_space["stdOptLv"] = GCCFlagInfo(name="stdOptLv", configs=[1,2,3], isParametric=True, stdOptLv=-1)
     with open(path, "r") as fp:
         stdOptLv = 0
         for raw_line in fp.read().split('\n'):
@@ -46,7 +46,7 @@ def read_gcc_opts(path):
 
 def convert_to_str(opt_setting, search_space):
     str_opt_setting = " -O" + str(opt_setting["stdOptLv"])
-     
+
     for flag_name, config in opt_setting.items():
         assert flag_name in search_space
         flag_info = search_space[flag_name]
@@ -57,10 +57,10 @@ def convert_to_str(opt_setting, search_space):
         # Binary flag
         else:
             if config:
-                str_opt_setting += f" {flag_name}"      
-               
+                str_opt_setting += f" {flag_name}"
+
     return str_opt_setting
-    
+
 
 # Define tuning task
 class cBenchEvaluator(Evaluator):
@@ -70,7 +70,7 @@ class cBenchEvaluator(Evaluator):
         self.search_space = search_space
 
     def build(self, str_opt_setting):
-        commands = f"""cd {self.path}; 
+        commands = f"""cd {self.path};
         make clean > /dev/null 2>/dev/null;
         make -j4 CCC_OPTS_ADD="{str_opt_setting}" LD_OPTS=" -o {self.artifact} -fopenmp" > /dev/null 2>/dev/null;
         """
@@ -82,16 +82,16 @@ class cBenchEvaluator(Evaluator):
         return 0
 
     def run(self, num_repeats, input_id=1):
-        run_commands = f"""cd {self.path}; 
+        run_commands = f"""cd {self.path};
         ./_ccc_check_output.clean ;
         ./__run {input_id} 2>&1;
         """
         verify_commands = f"""cd {self.path};
-        rm -f tmp-ccc-diff; 
+        rm -f tmp-ccc-diff;
         ./_ccc_check_output.diff {input_id};
         """
         tot = 0
-        
+
         # Repeat the measurement and get the averaged execution time
         for _ in range(num_repeats):
             # Run the executable
@@ -102,8 +102,8 @@ class cBenchEvaluator(Evaluator):
             # Check if the output is correct
             subprocess.Popen(verify_commands, stdout=subprocess.PIPE, shell=True).wait()
             diff_file = self.path+ "/tmp-ccc-diff"
-            if os.path.isfile(diff_file) and os.path.getsize(diff_file) == 0:    
-                # Runs correctly. Extract performance numbers.         
+            if os.path.isfile(diff_file) and os.path.getsize(diff_file) == 0:
+                # Runs correctly. Extract performance numbers.
                 for out in stdouts:
                     if out.startswith("real"):
                         out = out.replace("real\t", "")
@@ -116,7 +116,7 @@ class cBenchEvaluator(Evaluator):
                 return FLOAT_MAX
 
         # Correct execution
-        return tot/num_repeats        
+        return tot/num_repeats
 
     def evaluate(self, opt_setting, num_repeats=-1):
         error = self.build(convert_to_str(opt_setting, self.search_space))
@@ -124,7 +124,7 @@ class cBenchEvaluator(Evaluator):
             # Bulid error
             return FLOAT_MAX
 
-        # If not specified, use the default number of repeats    
+        # If not specified, use the default number of repeats
         if num_repeats == -1:
             num_repeats = self.num_repeats
 
@@ -135,7 +135,7 @@ class cBenchEvaluator(Evaluator):
 
 
     def clean(self):
-        commands = f"""cd {self.path}; 
+        commands = f"""cd {self.path};
         make clean > /dev/null 2>/dev/null;
         ./_ccc_check_output.clean ;
         """
@@ -143,18 +143,18 @@ class cBenchEvaluator(Evaluator):
 
 
 if __name__ == "__main__":
-    
-    ### [TODO] Configure experiment setting 
+
+    ### [TODO] Configure experiment setting
     ### BEGIN
-    # Assign the number of trials as the budget. 
+    # Assign the number of trials as the budget.
     budget = 1000
     # Benchmark info
     benchmark_home = "./cBench"
-    benchmark_list = ["consumer_jpeg_c"]
+    benchmark_list = ["network_dijkstra"] #["consumer_jpeg_c"]
     #benchmark_list = ["network_dijkstra", "consumer_jpeg_c", "telecom_adpcm_d"]
     gcc_optimization_info = "gcc_opts.txt"
     ### END
-    
+
     # Extract GCC search space
     search_space = read_gcc_opts(gcc_optimization_info)
     default_setting = {"stdOptLv":3}
@@ -167,10 +167,10 @@ if __name__ == "__main__":
         evaluator = cBenchEvaluator(path, num_repeats=30, search_space=search_space)
 
         tuners = [
-            #RandomTuner(search_space, evaluator, default_setting), 
+            #RandomTuner(search_space, evaluator, default_setting),
             SRTuner(search_space, evaluator, default_setting)
         ]
-        
+
         for tuner in tuners:
             best_opt_setting, best_perf = tuner.tune(budget)
             if best_opt_setting is not None:
