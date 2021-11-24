@@ -36,17 +36,27 @@ export PYTHONPATH=${SRTUNER_HOME}/lib:${PYTHONPATH}
 # Demo: build a standaline GCC tuning framework w/ SRTuner
 `demo/gcc` shows an example of building an independent tuning framework by using SRTuner primitives. 
 
+**How to install**
+
+1. Install SRTuner
+2. Install gcc
+
 **How to run**
 
 `python3 tune_gcc.py`
 
-**[TODO] How to customize**
-
-* want to tune different benchmark, compiler
-* want to change experiment setting (e.g., tuning budget)
-* want to customize SRTuner
 
 # Demo: integrate SRTuner into AutoTVM
+https://github.com/sunggg/tvm/tree/tvm-srtuner shows example of SRTuner integration. 
+
+**How to install**
+1. Install SRTuner
+2. `git clone --recursive -b tvm-srtuner https://github.com/sunggg/tvm.git`
+3. Install tvm: https://tvm.apache.org/docs/install/from_source.html
+
+**How to run**
+1. `cd tutorial/srtuner/`
+2. `python3 tune_relay_cuda.py`
 
 
 
