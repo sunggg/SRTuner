@@ -33,7 +33,7 @@ export SRTUNER_HOME=/path/to/repo
 export PYTHONPATH=${SRTUNER_HOME}/lib:${PYTHONPATH}
 ```
 
-# Demo: build a standaline GCC tuning framework w/ SRTuner
+# Demo: build a standaline tuning framework w/ SRTuner
 `demo/gcc` shows an example of building an independent tuning framework by using SRTuner primitives. 
 
 **How to install**
