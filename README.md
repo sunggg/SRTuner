@@ -52,7 +52,7 @@ https://github.com/sunggg/tvm/tree/tvm-srtuner shows example of SRTuner integrat
 **How to install**
 1. Install SRTuner
 2. `git clone --recursive -b tvm-srtuner https://github.com/sunggg/tvm.git`
-3. Install tvm: https://tvm.apache.org/docs/install/from_source.html
+3. Install tvm with SRTuner by following instruction: https://tvm.apache.org/docs/install/from_source.html
 
 **How to run**
 1. `cd tutorial/srtuner/`
