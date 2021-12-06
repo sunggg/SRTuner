@@ -17,6 +17,8 @@
       |- cBench/                   # representative benchmark applications
       |- gcc_opts.txt              # optimizations and their possible configurations
       |- tune_gcc.py               # script that tunes GCC optimizations for cBench
+   |- tvm
+      |- setup.sh                  # setup script for tvm with srtuner
 ```
 
 
@@ -50,10 +52,21 @@ export PYTHONPATH=${SRTUNER_HOME}/lib:${PYTHONPATH}
 https://github.com/sunggg/tvm/tree/tvm-srtuner shows example of SRTuner integration. 
 
 **How to install**
-1. Install SRTuner
+1. Install SRTuner by following instruction section. 
 2. `git clone --recursive -b tvm-srtuner https://github.com/sunggg/tvm.git`
 3. Install tvm with SRTuner by following instruction: https://tvm.apache.org/docs/install/from_source.html
 
+or
+
+1. Install SRTuner by following instruction section.
+2. `cd demo/tvm/`
+3. `bash setup.sh`
+4. Setup environment variables
+```
+export SRTUNER_HOME=/path/to/repo
+export TVM_SRTUNER_HOME=/path/to/repo
+export PYTHONPATH=${SRTUNER_HOME}/lib:${TVM_SRTUNER_HOME}/python:${PYTHONPATH}
+```
 **How to run**
 1. `cd tutorial/srtuner/`
 2. `python3 tune_relay_cuda.py`
