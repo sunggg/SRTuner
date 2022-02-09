@@ -52,12 +52,6 @@ export PYTHONPATH=${SRTUNER_HOME}/lib:${PYTHONPATH}
 https://github.com/sunggg/tvm/tree/tvm-srtuner shows example of SRTuner integration. 
 
 **How to install**
-1. Install SRTuner by following instruction section. 
-2. `git clone --recursive -b tvm-srtuner https://github.com/sunggg/tvm.git`
-3. Install tvm with SRTuner by following instruction: https://tvm.apache.org/docs/install/from_source.html
-
-or
-
 1. Install SRTuner by following instruction section.
 2. `cd demo/tvm/`
 3. `bash setup.sh`
