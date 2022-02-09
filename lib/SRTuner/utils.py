@@ -17,8 +17,10 @@ def isfloat(value):
 
 def convert_encoding_to_dict(search_space, opt_stage_mapping, encoding):
     # opt-stage mapping is the same order w/ encoding
+    encoding = encoding.split(',')
+    assert(len(opt_stage_mapping) == len(encoding))
     opt_setting = dict()
-    for opt_name, config in zip(opt_stage_mapping, encoding.split(',')):
+    for opt_name, config in zip(opt_stage_mapping, encoding):
         opt_setting[opt_name] = search_space[opt_name].configs[int(config)]
     return opt_setting
 
@@ -32,29 +34,19 @@ def delete_tree(root):
     gc.collect()
 
 
-def default_reward_func(perf, history, batch_size):
+def default_reward_func(perf, best_perf, num_trials, min_trials=10):
     # hyperparameters for reward calc
     # [TODO] Design reward policy that has less hyperparams
-    C = 40
-    window=700
+    C = 60
     max_reward=100
-    reward_margin = -0.03
+    reward_margin = -0.05
+    window = max(min_trials, num_trials-500)
 
-    num_trials = len(history)
-    ratio = history[-1]/perf
-
-    # [TODO] Simplify.
     reward = 0
-    if num_trials > max(batch_size, num_trials-window):
-        if ratio > 1+reward_margin:
-            if ratio<1:
-                factor = 10*(ratio-1)+1
-            else:
-                factor = 30*(ratio-1)+1
-
-            factor = max(0, factor)
-            reward = min(C*factor, max_reward)
-    return reward
+    ratio = best_perf/perf
+    if num_trials > window and ratio>1+reward_margin:
+        reward = min(C*ratio, max_reward)
+    return max(reward, 0)
 
 
 def getUCT(N, n, r):

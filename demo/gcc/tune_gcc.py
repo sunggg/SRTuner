@@ -32,7 +32,7 @@ def read_gcc_opts(path):
                     flag_name = tokens[0]
                     # Binary flag
                     if len(tokens) == 1:
-                        info = GCCFlagInfo(name=flag_name, configs=[True, False], isParametric=False, stdOptLv=stdOptLv)
+                        info = GCCFlagInfo(name=flag_name, configs=[False, True], isParametric=False, stdOptLv=stdOptLv)
                     # Parametric flag
                     else:
                         assert(len(tokens) == 2)
@@ -56,9 +56,12 @@ def convert_to_str(opt_setting, search_space):
                 str_opt_setting += f" {flag_name}={config}"
         # Binary flag
         else:
+            assert(isinstance(config, bool))
             if config:
                 str_opt_setting += f" {flag_name}"
-
+            else:
+                negated_flag_name = flag_name.replace("-f", "-fno-", 1)
+                str_opt_setting += f" {negated_flag_name}"
     return str_opt_setting
 
 
@@ -119,7 +122,8 @@ class cBenchEvaluator(Evaluator):
         return tot/num_repeats
 
     def evaluate(self, opt_setting, num_repeats=-1):
-        error = self.build(convert_to_str(opt_setting, self.search_space))
+        flags = convert_to_str(opt_setting, self.search_space)
+        error = self.build(flags)
         if error == -1:
             # Bulid error
             return FLOAT_MAX
@@ -143,17 +147,12 @@ class cBenchEvaluator(Evaluator):
 
 
 if __name__ == "__main__":
-
-    ### [TODO] Configure experiment setting
-    ### BEGIN
     # Assign the number of trials as the budget.
     budget = 1000
     # Benchmark info
     benchmark_home = "./cBench"
-    benchmark_list = ["network_dijkstra"] #["consumer_jpeg_c"]
-    #benchmark_list = ["network_dijkstra", "consumer_jpeg_c", "telecom_adpcm_d"]
+    benchmark_list = ["network_dijkstra", "consumer_jpeg_c", "telecom_adpcm_d"]
     gcc_optimization_info = "gcc_opts.txt"
-    ### END
 
     # Extract GCC search space
     search_space = read_gcc_opts(gcc_optimization_info)
@@ -167,7 +166,7 @@ if __name__ == "__main__":
         evaluator = cBenchEvaluator(path, num_repeats=30, search_space=search_space)
 
         tuners = [
-            #RandomTuner(search_space, evaluator, default_setting),
+            RandomTuner(search_space, evaluator, default_setting),
             SRTuner(search_space, evaluator, default_setting)
         ]
 

@@ -10,6 +10,7 @@ import random
 import pandas as pd
 import numpy as np
 import gc
+import time
 
 class FlagInfo:
     def __init__(self, name, configs):
@@ -65,9 +66,9 @@ class SRTunerModule():
         self.default_perf = default_perf
 
         # Create root node for multi-stage structure
-        if default_perf is None:
+        if default_perf is None or default_perf == FLOAT_MAX:
             self.root = Node(self.opt_stage_mapping[0], encoding="", num=0, reward=0, isDone=False, history=[])
-        elif default_perf != FLOAT_MAX:
+        else:
             self.root = Node(self.opt_stage_mapping[0], encoding="", num=0, reward=0, isDone=False, history=[default_perf])
 
         self.best_perf, self.worst_perf = FLOAT_MAX, FLOAT_MIN
@@ -79,6 +80,7 @@ class SRTunerModule():
         # [TODO] Can we remove this?
         self.current_candidate_nodes = []
         self.batch_size = 1
+        random.seed(time.time())
 
 
     # This will give you candidate and leaf node
@@ -104,6 +106,7 @@ class SRTunerModule():
                             new_encoding = str(chosenConfig)
                     return new_encoding
 
+                assert(enable_expansion)
                 # With node expansion
                 # Need to explore. Random sampling
                 while True:
@@ -198,7 +201,6 @@ class SRTunerModule():
     def generate_candidates(self, batch_size = 1, enable_expansion=True):
         self.batch_size = batch_size # [TODO] Can we remove this?
         candidates = []
-
         if enable_expansion:
             # This mode expands nodes during traversal. 
             # It returns a list of leaf nodes in the multistage structure.
@@ -209,8 +211,7 @@ class SRTunerModule():
                 opt_setting = convert_encoding_to_dict(self.search_space, self.opt_stage_mapping, leaf_node.encoding)
                 candidates.append(opt_setting)
                 self.current_candidate_nodes.append(leaf_node)
-                self.visited.add(leaf_node.encoding)
-
+            
             return candidates
         else:
             # This mode *DOES NOT* expand nodes during the traversal. 
@@ -308,11 +309,12 @@ class SRTunerModule():
         del klData, dfKlData
         gc.collect()
 
+        self.visited = set()
         root_num = self.root.num
         delete_tree(self.root)
-
+        default_perf = self.default_perf
         # Create root node for multi-stage structure
-        if self.default_perf is None:
+        if default_perf is None or default_perf == FLOAT_MAX:
             self.root = Node(self.opt_stage_mapping[0], encoding="", num=0, reward=0, isDone=False, history=[])
         elif self.default_perf != FLOAT_MAX:
             self.root = Node(self.opt_stage_mapping[0], encoding="", num=0, reward=0, isDone=False, history=[self.default_perf])
@@ -363,25 +365,30 @@ class SRTunerModule():
         assert isfloat(perf)
 
         node_list = [ leaf_node ]
+        self.visited.add(leaf_node.encoding)
         node_list.extend(reversed(leaf_node.ancestors))
+        assert(len(node_list) == self.num_optimizations+1)  # num_opts + leaf node
         root = node_list[-1]
-
+        assert(root.depth == 0)
+        
         for node in node_list:
-            reward = self.reward_func(perf, self.root.history, self.batch_size)
+            reward = self.reward_func(perf, self.best_perf, len(node.history))
             node.num += 1
             node.reward += reward
             node.history.append(perf)
             node.history.sort(reverse=True)
 
+        
+
 
     def reflect_feedback(self, perfs, remap_freq = 100):
         for leaf_node, perf in zip(self.current_candidate_nodes, perfs):
             self.backpropagate(leaf_node, perf)
-
             self.best_perf = min(self.best_perf, perf)
             if perf != FLOAT_MAX:
                 self.worst_perf = max(self.worst_perf, perf)
             self.trials.append([leaf_node.encoding, perf])
+            
 
         self.current_candidate_nodes = []
 

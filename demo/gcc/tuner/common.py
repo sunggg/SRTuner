@@ -59,7 +59,7 @@ class Tuner:
                     best_opt_setting = opt_setting
             
             
-            print(f"[{i}] {perf:.3f}s, {best_perf:.3f}s")
+            print(f"[{i}] current trial: {perf:.3f}s, best performance so far: {best_perf:.3f}s")
             
             self.reflect_feedback(perfs)
         return best_opt_setting, best_perf
