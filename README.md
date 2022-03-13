@@ -46,24 +46,3 @@ export PYTHONPATH=${SRTUNER_HOME}/lib:${PYTHONPATH}
 **How to run**
 
 `python3 tune_gcc.py`
-
-
-# Demo: integrate SRTuner into AutoTVM
-https://github.com/sunggg/tvm/tree/tvm-srtuner shows example of SRTuner integration. 
-
-**How to install**
-1. Install SRTuner by following instruction section.
-2. `cd demo/tvm/`
-3. `bash setup.sh`
-4. Setup environment variables
-```
-export SRTUNER_HOME=/path/to/repo
-export TVM_SRTUNER_HOME=/path/to/repo
-export PYTHONPATH=${SRTUNER_HOME}/lib:${TVM_SRTUNER_HOME}/python:${PYTHONPATH}
-```
-**How to run**
-1. `cd tutorial/srtuner/`
-2. `python3 tune_relay_cuda.py`
-
-
-
